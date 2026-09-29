@@ -102,9 +102,37 @@ python -m apply eval --jd posting.txt
 
 - `profile/profile.json`, `outputs/`, `tracker/applications.csv`, `.env` are
   git-ignored. Only `profile/profile.example.json` (fake data) is tracked.
+- The web app's runtime `data/` dir (per-user profiles, sessions, outputs) is
+  also git-ignored and lives outside the repo.
 - Do not fork publicly with real data in it. Clone privately instead.
 - Job postings are treated as untrusted input (prompt-injection defence is
   part of the reviewer prompt).
+
+## Web app (multi-user)
+
+`web/` is a zero-dependency multi-user web UI over the same pipeline —
+profile setup → fit scoring → tailored CV + cover letter
+(drafter → reviewer → revise, fabrication guard) → interview prep → tracker.
+It never auto-applies.
+
+```bash
+# create users (first one should be --admin)
+python -m web.app adduser alice --admin
+python -m web.app adduser bob
+
+# run it (env: DHRUV_APPLY_DATA, DHRUV_APPLY_PORT, APPLY_LLM_* as in Configuration)
+DHRUV_APPLY_DATA=~/dhruv-apply-data python -m web.app serve --port 8770
+```
+
+- Passwords are PBKDF2-hashed; sessions are random 256-bit tokens in cookies
+  (HttpOnly, Secure, SameSite=Lax, 24h expiry); login is rate-limited.
+- Each user gets an isolated workspace: own profile, outputs, and tracker.
+  Admins can create/disable users and reset passwords, but **cannot read
+  another user's data** — enforced in code and covered by the test suite.
+- Serve behind HTTPS (e.g. Caddy) in production; never expose it over plain
+  HTTP on a network you don't trust.
+- `APPLY_LLM_MOCK=1` runs the whole flow with canned LLM responses — useful
+  for smoke-testing while your LLM backend is down.
 
 ## Tests
 

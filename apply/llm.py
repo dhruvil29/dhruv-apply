@@ -38,6 +38,24 @@ def chat(messages, max_tokens=2500, temperature=0.3, timeout=180):
     if _DRY_RUN:
         return "[dry-run] LLM call skipped. Prompt preview:\n" + \
                messages[-1]["content"][:400]
+    if os.environ.get("APPLY_LLM_MOCK") == "1":
+        # Test-only: canned pipeline outputs, no network. Used to verify
+        # the full web/CLI flow while the gateway is rate-limited.
+        # Matched against prompts/*.md headers.
+        sys0 = messages[0]["content"] if messages[0]["role"] == "system" else ""
+        if "# Job-fit evaluation" in sys0:
+            return ("## VERDICT: Pursue\n## Fit score: 82/100\n\n"
+                    "## Requirement-by-requirement\n- Python APIs: strong match\n"
+                    "## Gaps\n- Go: not in profile\n## Risks\n- none material")
+        if "# CV reviewer" in sys0:
+            return "## PASS\nNo fabrication found."
+        if "# Cover-letter drafter" in sys0:
+            return ("Dear Hiring Manager,\n\nI am excited to apply... "
+                    "[mock cover letter]\n\nSincerely,\nCandidate")
+        if "# Interview prep" in sys0:
+            return ("# Interview brief\n\n## Likely questions\n1. Tell me about "
+                    "yourself [mock]\n## Questions to ask them\n1. Team shape?")
+        return "# Mock CV\n\n## Summary\nMock candidate summary.\n\n## Skills\n- Python\n\n_"
     base, model, key = config()
     payload = {"model": model, "messages": messages,
                "max_tokens": max_tokens, "temperature": temperature}

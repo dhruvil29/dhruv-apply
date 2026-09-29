@@ -3,6 +3,8 @@ profile/profile.json
 outputs/
 tracker/applications.csv
 .env
+# web app runtime data (per-user profiles, sessions, outputs)
+data/
 
 # Python
 __pycache__/
