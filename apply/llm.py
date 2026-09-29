@@ -2,7 +2,7 @@
 
 Config via env vars:
   APPLY_LLM_BASE_URL  default https://132-145-97-183.sslip.io/v1
-  APPLY_LLM_MODEL     default gemini-3.5-flash-lite
+  APPLY_LLM_MODEL     default gemini-3.1-flash-lite
   APPLY_LLM_API_KEY   bearer key; falls back to ~/.config/gateway-dispatch/api_key
 """
 import json
@@ -21,7 +21,7 @@ def set_dry_run(value=True):
 def config():
     base = os.environ.get("APPLY_LLM_BASE_URL",
                           "https://132-145-97-183.sslip.io/v1").rstrip("/")
-    model = os.environ.get("APPLY_LLM_MODEL", "gemini-3.5-flash-lite")
+    model = os.environ.get("APPLY_LLM_MODEL", "gemini-3.1-flash-lite")
     key = os.environ.get("APPLY_LLM_API_KEY", "")
     if not key:
         try:
