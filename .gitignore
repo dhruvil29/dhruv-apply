@@ -1,0 +1,11 @@
+# Personal data — NEVER commit
+profile/profile.json
+outputs/
+tracker/applications.csv
+.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
